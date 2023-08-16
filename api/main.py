@@ -1,4 +1,4 @@
-from utilities import checkFile_Extension,uploadFileAndInsertRecords
+from utilities import checkFile_Extension,uploadFileAndInsertRecords,insertRecordsDF,validateJsonFormat
 from flask import Flask,jsonify, request,abort
 from sqlalchemy import create_engine 
 from boto3 import client,session,resource
@@ -70,6 +70,50 @@ def uploadRecordsAndCSVfileInS3():
             
     except:
         return jsonify({"Error Message":"CSV File and records have not been inserted"})
+    return responseTxt
+
+#Receives a batch of transactions and inserts them into the database.
+@app.route("/transactions/batch", methods=["POST"])
+def transactions_batch():
+    try:
+        responseTxt = ""
+        transBatchLoad = json.loads(request.data)
+        print(str(len(transBatchLoad['transactions'])))
+        if len(transBatchLoad['transactions']) < 1 and len(transBatchLoad['transactions']) > 1000:
+            responseTxt = jsonify({"Error":"Batch can only contain up to 1000 transactions"})
+            abort(400, "Error")
+        
+        tableName = request.args.get("tablename")
+
+        df = json_normalize(transBatchLoad['transactions']) 
+        time_stamp = pd.Timestamp.now()
+        if tableName.lower() == "hired_employees" and validateJsonFormat(tableName,df):
+            df_nullRecords = insertRecordsDF(df,"hired_employees",engine,time_stamp)
+        elif tableName.lower() == "departments" and validateJsonFormat(tableName,df):
+            df_nullRecords = insertRecordsDF(df,"departments",engine,time_stamp)
+        elif tableName.lower() == "jobs" and validateJsonFormat(tableName,df):
+            df_nullRecords = insertRecordsDF(df,"jobs",engine,time_stamp)
+        else:
+            df_nullRecords = pd.DataFrame()
+            responseTxt = jsonify({"message":"Please check the file name contains the word: job,department or hire_employee"})
+
+        if df_nullRecords.shape[0] >=1:
+            df_nullRecords = df_nullRecords.drop(['last_update'], axis=1)
+            result = df_nullRecords.to_json(orient="records")
+            parsed = loads(result)
+            responseTxt= jsonify(message=f"{df_nullRecords.shape[0]} records have not been inserted because some records are null, please check all of them and try again.",
+                        category="Error",
+                        data=parsed,
+                        status=400
+            )
+        else:
+            if responseTxt == "":
+                responseTxt = jsonify({"Success":"Transactions inserted successfully"})
+    except:
+        if responseTxt == "":
+            return jsonify({"message":"Transactions have not been inserted"})
+        else:
+            return responseTxt
     return responseTxt
 
 if __name__=="__main__":

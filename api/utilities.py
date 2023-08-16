@@ -93,3 +93,46 @@ def cleanNullRecords(df,tableName):
         return [df_def,df_nullRecords]
     except Exception as error:
         return "Something went wrong when clean null records in the " + tableName + " table. " + "An exception occurred:", type(error).__name__
+
+#Insert new records into Database by pandasdf and sqlalchemy
+def insertRecordsDF(df,tableName,engine,time_stamp):
+    try:
+        conn = connectionPosgress(engine)
+        df['last_update'] = time_stamp
+        [df_def,df_nullRecords] = cleanNullRecords(df,tableName)
+        if df_def.shape[0] >=1:
+            df_def.to_sql(tableName, con=conn, if_exists='append',index=False)
+        conn.close()
+        return df_nullRecords
+    except Exception as error:
+        return "Something went wrong when inserting data in the " + tableName + " table. " + "An exception occurred:", type(error).__name__
+
+#Validate Json format to batch of transactions
+def validateJsonFormat(tableName,df):
+    try:
+        res = False
+        if df.shape[0] >=1:
+            if tableName.lower() == "hired_employees" and df.shape[1] == 5:
+                listNamesDef = ['id', 'name', 'datetime', 'department_id', 'job_id']
+                res = validateName(df.columns,listNamesDef)
+            elif tableName.lower() == "departments" and df.shape[1] == 2:
+                listNamesDef = ['id', 'department']
+                res = validateName(df.columns,listNamesDef)
+            elif tableName.lower() == "jobs" and df.shape[1] == 2:
+                listNamesDef = ['id', 'job']
+                res = validateName(df.columns,listNamesDef)
+        return res
+    except:
+        return "Something went wrong when validating Json Format."
+
+#Validate names to batch of transactions
+def validateName(listNames,listNamesDef):
+    try:
+        res = True
+        for lName in listNamesDef:
+            if  not(lName in listNames):
+                res = False
+                break
+        return res
+    except:
+        return "Something went wrong when validating name."
