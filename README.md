@@ -1,12 +1,12 @@
 # CodingChallengeAPI
 
-### Clone repository
+## 1. Clone repository
 
 First at all, we need to clone the repository with the following code:
 ```
 git clone https://github.com/pgarciap/CodingChallengeAPI.git
 ```
-### Docker-compose
+## 2.Docker-compose
 #### Prerequisites
 You need to have Docker Engine and Docker Compose on your machine. You can either:
   - Install Docker Engine and Docker Compose as standalone binaries
@@ -21,7 +21,8 @@ and then
 docker-compose up
 ```
 
-### Test
+
+## 3.Test
 
 Open pgAdmin
 ```
@@ -56,7 +57,7 @@ CREATE TABLE IF NOT EXISTS hired_employees(
 );
 ```
 
-# Receive historical data from CSV files and Upload these files to the new DB, and upload the file in S3
+### 3.1. Receive historical data from CSV files and Upload these files to the new DB, and upload the file in S3
 ```
 POST: http://127.0.0.1:80/files
 ```
@@ -83,7 +84,7 @@ Test for hired_employees
 }
 ```
 
-#### Receives a batch of transactions and inserts them into the database.
+### 3.2. Receives a batch of transactions and inserts them into the database.
 ```
 POST: http://127.0.0.1:80/transactions/batch?tablename=jobs
 ```
@@ -154,13 +155,20 @@ Body: Json
 
 ```
 
-#### get employees hired by job and department
+### 3.3. Get employees hired by job and department
 ```
 GET: http://172.21.0.3:80/employees_hired/by-job-and-department?year=2021
 ```
 
-### get employees hired by department
+### 3.4. Get employees hired by department
 ```
 GET: http://127.0.0.1:80/employees_hired/by-department?year=2021
 ```
+
+## 4. AWS - EC2
+- Create an AWS EC2 instance
+- SSH into the AWS EC2 instance.
+- clone github repository.(Step 1)
+- Pull the Docker images from the Docker registry.(Step 2)
+- Run the docker-compose.yml file to deploy the API on the AWS EC2 instance.(Step 2)
 
