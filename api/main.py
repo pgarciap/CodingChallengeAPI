@@ -95,7 +95,7 @@ def transactions_batch():
             df_nullRecords = insertRecordsDF(df,"jobs",engine,time_stamp)
         else:
             df_nullRecords = pd.DataFrame()
-            responseTxt = jsonify({"message":"Please check the file name contains the word: job,department or hire_employee"})
+            responseTxt = jsonify({"message":"Please check the file name contains the word: jobs,departments or hire_employees"})
 
         if df_nullRecords.shape[0] >=1:
             df_nullRecords = df_nullRecords.drop(['last_update'], axis=1)
