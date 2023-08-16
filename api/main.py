@@ -129,7 +129,7 @@ def getEmployeesHiredByDepartment():
   except:
       return jsonify({"message":"can't get the report, please try with other year."})
 
-# get employees hired by job and department
+# get employees hired by department
 @app.route("/employees_hired/by-department", methods=["GET"])
 def getEmployeesHiredByJobAndDepartment():
   try:
