@@ -1,4 +1,5 @@
 from utilities import checkFile_Extension,uploadFileAndInsertRecords,insertRecordsDF,validateJsonFormat
+from reports import connectionPsycopg2,getReportEmployeesHiredByJobAndDepartment
 from flask import Flask,jsonify, request,abort
 from sqlalchemy import create_engine 
 from boto3 import client,session,resource
@@ -115,6 +116,18 @@ def transactions_batch():
         else:
             return responseTxt
     return responseTxt
+
+@app.route("/employees_hired/by-job-and-department", methods=["GET"])
+# get employees hired by job and department
+def getEmployeesHiredByJobAndDepartment():
+  try:
+    ryear = request.args.get("year")
+    conn = connectionPsycopg2
+    employees_hired = getReportEmployeesHiredByJobAndDepartment(conn, int(ryear))
+    conn.close()
+    return jsonify(employees_hired)
+  except:
+      return jsonify({"message":"can't get the report, please try with other year."})
 
 if __name__=="__main__":
     app.run(host="0.0.0.0",port=80)
