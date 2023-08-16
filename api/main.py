@@ -19,8 +19,8 @@ engine = create_engine(connection_db)
 #create s3 object
 s3 = resource(
     's3',
-    aws_access_key_id='AKIA5NEVWXTGKGDAEVPG',
-    aws_secret_access_key='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'
+    aws_access_key_id='xxx',
+    aws_secret_access_key='xxxxxx'
 )
 
 # Receive historical data from CSV files and Upload these files to the new DB, and upload the file in S3
@@ -117,24 +117,24 @@ def transactions_batch():
             return responseTxt
     return responseTxt
 
-@app.route("/employees_hired/by-job-and-department", methods=["GET"])
 # get employees hired by job and department
+@app.route("/employees_hired/by-job-and-department", methods=["GET"])
 def getEmployeesHiredByDepartment():
   try:
     ryear = request.args.get("year")
-    conn = connectionPsycopg2
+    conn = connectionPsycopg2()
     employees_hired = getReportEmployeesHiredByJobAndDepartment(conn, int(ryear))
     conn.close()
     return jsonify(employees_hired)
   except:
       return jsonify({"message":"can't get the report, please try with other year."})
-  
-@app.route("/employees_hired/by-department", methods=["GET"])
+
 # get employees hired by job and department
+@app.route("/employees_hired/by-department", methods=["GET"])
 def getEmployeesHiredByJobAndDepartment():
   try:
     ryear = request.args.get("year")
-    conn = connectionPsycopg2
+    conn = connectionPsycopg2()
     employees_hired = getReportByDepartments(conn, int(ryear))
     conn.close()
     return jsonify(employees_hired)
