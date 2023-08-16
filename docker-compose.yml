@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  app_pg:
+    container_name: api_PaolaGacia
+    build: ./api
+    ports:
+      - "5000:80"
+    depends_on:
+      - postgres_db
+    links:
+      - postgres_db
+  postgres_db:
+    container_name: posgres_database
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./database.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - ./pgadmin.env
+    ports:
+      - "80:80"
+    depends_on:
+      - postgres_db
+    container_name: pgadmin4
+volumes:
+  pgdata: {}

@@ -1,0 +1,6 @@
+Flask
+SQLAlchemy
+Flask-SQLAlchemy
+pandas
+fsspec
+boto3
