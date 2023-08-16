@@ -84,7 +84,41 @@ def getReportEmployeesHiredByJobAndDepartment(conn, strYear):
             })
         return metrics
     except Exception as error:
-         return "Something went wrong when creating the Psycopg2 connection. "+"An exception occurred:" + type(error).__name__
+         return "Something went wrong when getting report employees hired by Job and Department. "+"An exception occurred:" + type(error).__name__
     
+# get report by departments
+def getReportByDepartments(conn, strYear):
+    try:
+        query = """
+                    with employeesByDep as (
+                    select department_id,count(*) as hired
+                        from hired_employees_test
+                        where date_part('year', datetime::date) = %s
+                        group by 1
+                    )
+                    select id,department,hired
+                        from departments d
+                        left join employeesByDep ed on ed.department_id = d.id
+                        order by 3 desc;
+            """
 
+        if strYear is not None:
+            params = (strYear)
+        else:
+            params = ()
 
+        cur = conn.cursor()
+        cur.execute(query, params)
+
+        metrics = []
+        for row in cur:
+            metrics.append({
+            "id": row[0],
+            "department": row[1],
+            "hired": row[2],
+            })
+
+        return metrics
+    except Exception as error:
+         return "Something went wrong when getting report by departments. "+"An exception occurred:" + type(error).__name__
+    
