@@ -24,7 +24,7 @@ s3 = resource(
 
 # Receive historical data from CSV files and Upload these files to the new DB, and upload the file in S3
 @app.route('/files',methods=["POST"])
-def upload_file():
+def uploadRecordsAndCSVfileInS3():
     try:
         responseTxt = ""
         data = request.get_json()
@@ -71,3 +71,6 @@ def upload_file():
     except:
         return jsonify({"Error Message":"CSV File and records have not been inserted"})
     return responseTxt
+
+if __name__=="__main__":
+    app.run(host="0.0.0.0",port=80)
